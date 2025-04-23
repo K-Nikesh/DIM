@@ -1,3 +1,4 @@
+
 // "use client"
 
 // import { createContext, useContext, useState, useEffect } from "react"
@@ -10,10 +11,8 @@
 //   listenForEvents,
 // } from "../utils/contract"
 
-// // Create the context
 // const ContractContext = createContext(null)
 
-// // Custom hook to use the contract context
 // export const useContract = () => {
 //   const context = useContext(ContractContext)
 //   if (!context) {
@@ -22,7 +21,6 @@
 //   return context
 // }
 
-// // Provider component
 // export const ContractProvider = ({ children }) => {
 //   const [account, setAccount] = useState("")
 //   const [contract, setContract] = useState(null)
@@ -33,75 +31,111 @@
 //   const [loading, setLoading] = useState(true)
 //   const [error, setError] = useState(null)
 
-//   // Initialize the contract and account
-//   useEffect(() => {
-//     const init = async () => {
-//       try {
-//         setLoading(true)
-//         setError(null)
+//   const adminAddress = "0xbC259400E046F6581439D028E81722736CC68f98"
 
-//         // Check if MetaMask is installed
-//         if (!window.ethereum) {
-//           throw new Error("MetaMask is not installed")
-//         }
-
-//         // Get the provider and signer
-//         const { provider, signer } = await getProviderAndSigner()
-
-//         // Get the current account
-//         const accounts = await provider.listAccounts()
-//         if (accounts.length === 0) {
-//           throw new Error("No accounts found. Please connect to MetaMask")
-//         }
-
-//         const currentAccount = accounts[0]
-//         setAccount(currentAccount)
-
-//         // Get the contract instance
-//         const contractInstance = getContract(signer)
-//         setContract(contractInstance)
-
-//         // Check if the user is an admin (for demo purposes, we'll check if it's the contract deployer)
-//         // In a real app, you would have a proper admin check in the contract
-//         const adminAddress = "0xbC259400E046F6581439D028E81722736CC68f98" 
-//         setIsAdmin(currentAccount.toLowerCase() === adminAddress.toLowerCase())
-
-//         // Check if the user is an approved issuer
-//         const issuerStatus = await checkIssuerStatus(currentAccount)
-//         setIsIssuer(issuerStatus)
-
-//         // Check if the user has a registered identity
-//         const identity = await checkIdentityStatus(currentAccount)
-//         setIsRegistered(identity.isRegistered)
-
-//         // Get the user's credentials
-//         const userCredentials = await getCredentials(currentAccount)
-//         setCredentials(userCredentials)
-
-//         // Set up event listeners
-//         const cleanupEvents = listenForEvents(contractInstance, handleContractEvent)
-
-//         setLoading(false)
-
-//         // Clean up event listeners when component unmounts
-//         return () => {
-//           cleanupEvents()
-//         }
-//       } catch (err) {
-//         console.error("Error initializing contract:", err)
-//         setError(err.message)
-//         setLoading(false)
+//   const safeCall = async (fn, fallback = null) => {
+//     try {
+//       return await fn()
+//     } catch (err) {
+//       if (err.code === "CALL_EXCEPTION") {
+//         console.warn("SafeCall Revert (likely function missing):", err)
+//         return fallback
 //       }
+//       throw err
 //     }
+//   }
 
+//   const init = async () => {
+//     try {
+//       setLoading(true)
+//       setError(null)
+
+//       if (!window.ethereum) {
+//         throw new Error("MetaMask is not installed")
+//       }
+
+//       const { provider, signer } = await getProviderAndSigner()
+//       const accounts = await provider.listAccounts()
+//       if (accounts.length === 0) throw new Error("Please connect to MetaMask")
+
+//       const currentAccount = accounts[0]
+//       setAccount(currentAccount)
+
+//       const contractInstance = getContract(signer)
+//       setContract(contractInstance)
+
+//       setIsAdmin(currentAccount.toLowerCase() === adminAddress.toLowerCase())
+
+//       const issuerStatus = await safeCall(() => checkIssuerStatus(currentAccount), false)
+//       setIsIssuer(issuerStatus)
+
+//       const identity = await safeCall(() => checkIdentityStatus(currentAccount), { isRegistered: false })
+//       setIsRegistered(identity.isRegistered)
+
+//       const userCredentials = await safeCall(() => getCredentials(currentAccount), [])
+//       setCredentials(userCredentials)
+
+//       const cleanupEvents = listenForEvents(contractInstance, handleContractEvent)
+//       setLoading(false)
+
+//       return () => cleanupEvents()
+//     } catch (err) {
+//       console.error("Error initializing contract:", err)
+//       setError(err.message || "Unknown error")
+//       setLoading(false)
+//     }
+//   }
+
+//   const refreshUserData = async () => {
+//     try {
+//       setLoading(true)
+
+//       const issuerStatus = await safeCall(() => checkIssuerStatus(account), false)
+//       setIsIssuer(issuerStatus)
+
+//       const identity = await safeCall(() => checkIdentityStatus(account), { isRegistered: false })
+//       setIsRegistered(identity.isRegistered)
+
+//       const userCredentials = await safeCall(() => getCredentials(account), [])
+//       setCredentials(userCredentials)
+
+//       setLoading(false)
+//     } catch (err) {
+//       console.error("Error refreshing user data:", err)
+//       setError(err.message)
+//       setLoading(false)
+//     }
+//   }
+
+//   const handleContractEvent = async (event) => {
+//     console.log("Contract event:", event)
+
+//     try {
+//       if (event.type === "IdentityRegistered" && event.user === account) {
+//         setIsRegistered(true)
+//       } else if (event.type === "IssuerApproved" && event.issuer === account) {
+//         setIsIssuer(true)
+//       } else if (event.type === "IssuerRevoked" && event.issuer === account) {
+//         setIsIssuer(false)
+//       } else if (
+//         (event.type === "CredentialIssued" || event.type === "CredentialRevoked") &&
+//         event.user === account
+//       ) {
+//         const userCredentials = await safeCall(() => getCredentials(account), [])
+//         setCredentials(userCredentials)
+//       }
+//     } catch (err) {
+//       console.error("Error handling event update:", err)
+//     }
+//   }
+
+//   useEffect(() => {
 //     init()
 
-//     // Listen for account changes
 //     if (window.ethereum) {
 //       window.ethereum.on("accountsChanged", (accounts) => {
 //         if (accounts.length > 0) {
 //           setAccount(accounts[0])
-//           // Reinitialize when account changes
 //           init()
 //         } else {
 //           setAccount("")
@@ -114,61 +148,12 @@
 //     }
 
 //     return () => {
-//       // Clean up listeners
 //       if (window.ethereum) {
 //         window.ethereum.removeAllListeners("accountsChanged")
 //       }
 //     }
 //   }, [])
 
-//   // Handle contract events
-//   const handleContractEvent = async (event) => {
-//     console.log("Contract event:", event)
-
-//     // Refresh data based on event type
-//     if (event.type === "IdentityRegistered" && event.user === account) {
-//       setIsRegistered(true)
-//     } else if (event.type === "IssuerApproved" && event.issuer === account) {
-//       setIsIssuer(true)
-//     } else if (event.type === "IssuerRevoked" && event.issuer === account) {
-//       setIsIssuer(false)
-//     } else if (event.type === "CredentialIssued" && event.user === account) {
-//       // Refresh credentials
-//       const userCredentials = await getCredentials(account)
-//       setCredentials(userCredentials)
-//     } else if (event.type === "CredentialRevoked" && event.user === account) {
-//       // Refresh credentials
-//       const userCredentials = await getCredentials(account)
-//       setCredentials(userCredentials)
-//     }
-//   }
-
-//   // Refresh user data
-//   const refreshUserData = async () => {
-//     try {
-//       setLoading(true)
-
-//       // Check if the user is an approved issuer
-//       const issuerStatus = await checkIssuerStatus(account)
-//       setIsIssuer(issuerStatus)
-
-//       // Check if the user has a registered identity
-//       const identity = await checkIdentityStatus(account)
-//       setIsRegistered(identity.isRegistered)
-
-//       // Get the user's credentials
-//       const userCredentials = await getCredentials(account)
-//       setCredentials(userCredentials)
-
-//       setLoading(false)
-//     } catch (err) {
-//       console.error("Error refreshing user data:", err)
-//       setError(err.message)
-//       setLoading(false)
-//     }
-//   }
-
-//   // Context value
 //   const value = {
 //     account,
 //     contract,
@@ -195,6 +180,7 @@ import {
   checkIdentityStatus,
   checkIssuerStatus,
   getCredentials,
+  getCredentialRequests,
   listenForEvents,
 } from "../utils/contract"
 
@@ -215,6 +201,7 @@ export const ContractProvider = ({ children }) => {
   const [isIssuer, setIsIssuer] = useState(false)
   const [isRegistered, setIsRegistered] = useState(false)
   const [credentials, setCredentials] = useState([])
+  const [credentialRequests, setCredentialRequests] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -262,6 +249,12 @@ export const ContractProvider = ({ children }) => {
       const userCredentials = await safeCall(() => getCredentials(currentAccount), [])
       setCredentials(userCredentials)
 
+      // If user is an issuer, get credential requests
+      if (issuerStatus) {
+        const requests = await safeCall(() => getCredentialRequests(currentAccount), [])
+        setCredentialRequests(requests)
+      }
+
       const cleanupEvents = listenForEvents(contractInstance, handleContractEvent)
       setLoading(false)
 
@@ -286,6 +279,12 @@ export const ContractProvider = ({ children }) => {
       const userCredentials = await safeCall(() => getCredentials(account), [])
       setCredentials(userCredentials)
 
+      // If user is an issuer, refresh credential requests
+      if (issuerStatus) {
+        const requests = await safeCall(() => getCredentialRequests(account), [])
+        setCredentialRequests(requests)
+      }
+
       setLoading(false)
     } catch (err) {
       console.error("Error refreshing user data:", err)
@@ -302,14 +301,23 @@ export const ContractProvider = ({ children }) => {
         setIsRegistered(true)
       } else if (event.type === "IssuerApproved" && event.issuer === account) {
         setIsIssuer(true)
+        // Get credential requests for the newly approved issuer
+        const requests = await safeCall(() => getCredentialRequests(account), [])
+        setCredentialRequests(requests)
       } else if (event.type === "IssuerRevoked" && event.issuer === account) {
         setIsIssuer(false)
-      } else if (
-        (event.type === "CredentialIssued" || event.type === "CredentialRevoked") &&
-        event.user === account
-      ) {
+        setCredentialRequests([])
+      } else if ((event.type === "CredentialIssued" || event.type === "CredentialRevoked") && event.user === account) {
         const userCredentials = await safeCall(() => getCredentials(account), [])
         setCredentials(userCredentials)
+      } else if (event.type === "CredentialRequested" && event.issuer === account) {
+        // Refresh credential requests for the issuer
+        const requests = await safeCall(() => getCredentialRequests(account), [])
+        setCredentialRequests(requests)
+      } else if (event.type === "CredentialRequestReviewed" && event.issuer === account) {
+        // Refresh credential requests for the issuer
+        const requests = await safeCall(() => getCredentialRequests(account), [])
+        setCredentialRequests(requests)
       }
     } catch (err) {
       console.error("Error handling event update:", err)
@@ -330,6 +338,7 @@ export const ContractProvider = ({ children }) => {
           setIsIssuer(false)
           setIsRegistered(false)
           setCredentials([])
+          setCredentialRequests([])
         }
       })
     }
@@ -348,6 +357,7 @@ export const ContractProvider = ({ children }) => {
     isIssuer,
     isRegistered,
     credentials,
+    credentialRequests,
     loading,
     error,
     refreshUserData,

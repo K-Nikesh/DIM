@@ -16,6 +16,24 @@ const contractABI = [
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "credentialHash",
+				"type": "string"
+			}
+		],
+		"name": "approveRequest",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
@@ -43,6 +61,56 @@ const contractABI = [
 			}
 		],
 		"name": "CredentialIssued",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "issuer",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "approved",
+				"type": "bool"
+			}
+		],
+		"name": "CredentialRequestReviewed",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "requester",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "issuer",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "requestData",
+				"type": "string"
+			}
+		],
+		"name": "CredentialRequested",
 		"type": "event"
 	},
 	{
@@ -84,24 +152,6 @@ const contractABI = [
 		"type": "event"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "credentialHash",
-				"type": "string"
-			}
-		],
-		"name": "issueCredential",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -136,6 +186,37 @@ const contractABI = [
 			}
 		],
 		"name": "registerIdentity",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "rejectRequest",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "issuer",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "requestData",
+				"type": "string"
+			}
+		],
+		"name": "requestCredential",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -216,6 +297,50 @@ const contractABI = [
 				"type": "uint256"
 			}
 		],
+		"name": "credentialRequests",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "requestData",
+				"type": "string"
+			},
+			{
+				"internalType": "address",
+				"name": "requester",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "requestedAt",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "isApproved",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "isReviewed",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
 		"name": "credentials",
 		"outputs": [
 			{
@@ -237,6 +362,52 @@ const contractABI = [
 				"internalType": "bool",
 				"name": "isRevoked",
 				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "issuer",
+				"type": "address"
+			}
+		],
+		"name": "getCredentialRequests",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "requestData",
+						"type": "string"
+					},
+					{
+						"internalType": "address",
+						"name": "requester",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "requestedAt",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "isApproved",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isReviewed",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct DecentralizedIM.CredentialRequest[]",
+				"name": "",
+				"type": "tuple[]"
 			}
 		],
 		"stateMutability": "view",
@@ -338,8 +509,8 @@ const contractABI = [
 	}
 ]
 
-// Contract address - replace with your deployed contract address
-const CONTRACT_ADDRESS = "0xdB25F7ba7A3F9a67F6D003c6E895e1642f1fb0E7" 
+const CONTRACT_ADDRESS = "0x06eda802155538e8521Aa6B4C7C05E9A27B539AC" 
+
 
 // Create a contract instance
 export const getContract = (signer) => {
@@ -479,60 +650,136 @@ export const isCredentialValid = async (userAddress, index) => {
   }
 }
 
-// Helper function to store credential data in IPFS
-export const storeCredentialData = async (data) => {
-  // This is a mock function - in a real app, you would use a service like Pinata, Infura, or Web3.Storage
-  // to store the data on IPFS and return the hash
-  console.log("Storing credential data:", data)
-
-  // Mock IPFS hash generation
-  const mockHash = "Qm" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-  return mockHash
-}
-
-// Listen for contract events
-export const listenForEvents = (contract, callback) => {
-  contract.on("IdentityRegistered", (user, metadata) => {
-    callback({
-      type: "IdentityRegistered",
-      user,
-      metadata,
-    })
-  })
-
-  contract.on("CredentialIssued", (user, issuer, credentialHash) => {
-    callback({
-      type: "CredentialIssued",
-      user,
-      issuer,
-      credentialHash,
-    })
-  })
-
-  contract.on("CredentialRevoked", (user, index) => {
-    callback({
-      type: "CredentialRevoked",
-      user,
-      index,
-    })
-  })
-
-  contract.on("IssuerApproved", (issuer) => {
-    callback({
-      type: "IssuerApproved",
-      issuer,
-    })
-  })
-
-  contract.on("IssuerRevoked", (issuer) => {
-    callback({
-      type: "IssuerRevoked",
-      issuer,
-    })
-  })
-
-  // Return a function to remove the listeners
-  return () => {
-    contract.removeAllListeners()
+// New Credential Request Functions
+export const requestCredential = async (issuerAddress, requestData) => {
+	try {
+	  const { signer } = await getProviderAndSigner()
+	  const contract = getContract(signer)
+	  const tx = await contract.requestCredential(issuerAddress, requestData)
+	  return await tx.wait()
+	} catch (error) {
+	  console.error("Error requesting credential:", error)
+	  throw error
+	}
   }
+  
+  export const approveCredentialRequest = async (index, credentialHash) => {
+	try {
+	  const { signer } = await getProviderAndSigner()
+	  const contract = getContract(signer)
+	  const tx = await contract.approveRequest(index, credentialHash)
+	  return await tx.wait()
+	} catch (error) {
+	  console.error("Error approving credential request:", error)
+	  throw error
+	}
+  }
+  
+  export const rejectCredentialRequest = async (index) => {
+	try {
+	  const { signer } = await getProviderAndSigner()
+	  const contract = getContract(signer)
+	  const tx = await contract.rejectRequest(index)
+	  return await tx.wait()
+	} catch (error) {
+	  console.error("Error rejecting credential request:", error)
+	  throw error
+	}
+  }
+  
+  export const getCredentialRequests = async (issuerAddress) => {
+	try {
+	  const { provider } = await getProviderAndSigner()
+	  const contract = getContract(provider)
+	  const requests = await contract.getCredentialRequests(issuerAddress)
+  
+	  // Format the requests for easier use in the UI
+	  return requests.map((req, index) => ({
+		id: index,
+		requestData: req.requestData,
+		requester: req.requester,
+		requestedAt: new Date(req.requestedAt.toNumber() * 1000).toISOString().split("T")[0],
+		isApproved: req.isApproved,
+		isReviewed: req.isReviewed,
+	  }))
+	} catch (error) {
+	  console.error("Error getting credential requests:", error)
+	  throw error
+	}
+  }
+  
+  // Helper function to store credential data in IPFS
+  export const storeCredentialData = async (data) => {
+	// This is a mock function - in a real app, you would use a service like Pinata, Infura, or Web3.Storage
+	// to store the data on IPFS and return the hash
+	console.log("Storing credential data:", data)
+  
+	// Mock IPFS hash generation
+	const mockHash = "Qm" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+	return mockHash
+  }
+  
+  // Listen for contract events
+  export const listenForEvents = (contract, callback) => {
+	contract.on("IdentityRegistered", (user, metadata) => {
+	  callback({
+		type: "IdentityRegistered",
+		user,
+		metadata,
+	  })
+	})
+  
+	contract.on("CredentialIssued", (user, issuer, credentialHash) => {
+	  callback({
+		type: "CredentialIssued",
+		user,
+		issuer,
+		credentialHash,
+	  })
+	})
+  
+	contract.on("CredentialRevoked", (user, index) => {
+	  callback({
+		type: "CredentialRevoked",
+		user,
+		index,
+	  })
+	})
+  
+	contract.on("IssuerApproved", (issuer) => {
+	  callback({
+		type: "IssuerApproved",
+		issuer,
+	  })
+	})
+  
+	contract.on("IssuerRevoked", (issuer) => {
+	  callback({
+		type: "IssuerRevoked",
+		issuer,
+	  })
+	})
+  
+	contract.on("CredentialRequested", (requester, issuer, requestData) => {
+	  callback({
+		type: "CredentialRequested",
+		requester,
+		issuer,
+		requestData,
+	  })
+	})
+  
+	contract.on("CredentialRequestReviewed", (issuer, index, approved) => {
+	  callback({
+		type: "CredentialRequestReviewed",
+		issuer,
+		index,
+		approved,
+	  })
+	})
+  
+	// Return a function to remove the listeners
+	return () => {
+	  contract.removeAllListeners()
+	}
 }
