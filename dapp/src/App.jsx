@@ -3,9 +3,9 @@ import React from 'react';
  import LandingPage from './Pages/Landing'; 
  import Dashboard from './Pages/Dashboard'; 
 import { ContractProvider } from './context/ContractContext';
-import AuthDemoPage from './Pages/auth-demo';
 import ConsentDashboard from './Pages/consent-dashboard';
 import SSIDemoPage from './Pages/ssi-demo';
+import DataSharingPage from './Pages/data-sharing-page';
 
  function App() 
  { return ( 
@@ -15,9 +15,9 @@ import SSIDemoPage from './Pages/ssi-demo';
   <Routes>
      <Route path="/" element={<LandingPage />} />
       <Route path="/dashboard/*" element={<Dashboard />} /> 
-      <Route path="/auth" element={<AuthDemoPage />} /> 
       <Route path="/cd" element={<ConsentDashboard />} /> 
       <Route path="/ssi-auth" element={<SSIDemoPage />} />
+      <Route path="//data-sharing" element={<DataSharingPage />} />
      
   </Routes> 
   </div> 

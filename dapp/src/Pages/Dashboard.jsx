@@ -34,6 +34,9 @@ import {
   rejectCredentialRequest,
 } from "../utils/contract"
 import { uploadFileToPinata, uploadMetadataToPinata } from "../utils/pinata"
+import { DataSharingPage } from "../Pages/data-sharing-page"
+import ConsentDashboard from "./consent-dashboard"
+import SSIDemoPage from "./ssi-demo"
 
 function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -208,6 +211,26 @@ function Dashboard() {
                 {sidebarOpen && <span>Settings</span>}
               </Link>
             </li>
+            <li>
+              <Link
+                to="/dashboard/cd"
+                className={`flex items-center space-x-3 p-3 rounded-lg ${activePage === "consent" ? "bg-blue-900/50 text-blue-400" : "hover:bg-gray-700"}`}
+                onClick={() => setActivePage("consent")}
+              >
+                <Shield className="h-5 w-5" />
+                {sidebarOpen && <span>Consent Manager</span>}
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dashboard/ssi-auth"
+                className={`flex items-center space-x-3 p-3 rounded-lg ${activePage === "ssi-demo" ? "bg-blue-900/50 text-blue-400" : "hover:bg-gray-700"}`}
+                onClick={() => setActivePage("ssi-demo")}
+              >
+                <Key className="h-5 w-5" />
+                {sidebarOpen && <span>SSI Demo</span>}
+              </Link>
+            </li>
           </ul>
         </nav>
 
@@ -305,6 +328,12 @@ function Dashboard() {
             }
           />
           <Route path="/settings" element={<SettingsPage account={account} />} />
+          <Route
+            path="/data-sharing"
+            element={<DataSharingPage account={account} credentials={credentials} refreshData={refreshUserData} />}
+          />
+          <Route path="/cd" element={<ConsentDashboard />} />
+          <Route path="/ssi-auth" element={<SSIDemoPage />} />
         </Routes>
       </div>
     </div>
