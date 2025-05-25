@@ -6,6 +6,7 @@ import { ContractProvider } from './context/ContractContext';
 import ConsentDashboard from './Pages/consent-dashboard';
 import SSIDemoPage from './Pages/ssi-demo';
 import DataSharingPage from './Pages/data-sharing-page';
+import AuthDemoPage from './Pages/auth-demo';
 
  function App() 
  { return ( 
@@ -17,7 +18,8 @@ import DataSharingPage from './Pages/data-sharing-page';
       <Route path="/dashboard/*" element={<Dashboard />} /> 
       <Route path="/cd" element={<ConsentDashboard />} /> 
       <Route path="/ssi-auth" element={<SSIDemoPage />} />
-      <Route path="//data-sharing" element={<DataSharingPage />} />
+      <Route path="/data-sharing" element={<DataSharingPage />} />
+      <Route path="/ssi-single" element={<AuthDemoPage />} />
      
   </Routes> 
   </div> 

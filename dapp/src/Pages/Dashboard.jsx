@@ -21,6 +21,7 @@ import {
   Send,
   Inbox,
   MessageSquare,
+  BarChart3,
 } from "lucide-react"
 import { useContract } from "../context/ContractContext"
 import {
@@ -219,6 +220,16 @@ function Dashboard() {
               >
                 <Shield className="h-5 w-5" />
                 {sidebarOpen && <span>Consent Manager</span>}
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dashboard/data-sharing"
+                className={`flex items-center space-x-3 p-3 rounded-lg ${activePage === "data-sharing" ? "bg-blue-900/50 text-blue-400" : "hover:bg-gray-700"}`}
+                onClick={() => setActivePage("data-sharing")}
+              >
+                <BarChart3 className="h-5 w-5" />
+                {sidebarOpen && <span>Data Analytics</span>}
               </Link>
             </li>
             <li>

@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Shield, Eye, Globe, Lock, CheckCircle, AlertTriangle, Settings } from "lucide-react"
+import { Shield, Eye, Globe, Lock, CheckCircle, AlertTriangle, Settings, BarChart3 } from "lucide-react"
 import { getLocalConsents, DATA_CATEGORIES, filterDataByConsent } from "../utils/selective-disclosure"
 import SelectiveAuthWidget from "../components/selective-auth-widget"
+import { AnalyticsDashboard } from "../Pages/analytics-dashboard"
 
 // Data Sharing Management Page - integrated into the main dashboard
 export function DataSharingPage({ account, credentials, refreshData }) {
@@ -114,13 +115,22 @@ export function DataSharingPage({ account, credentials, refreshData }) {
           Data Categories
         </button>
         <button
+          onClick={() => setActiveTab("analytics")}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            activeTab === "analytics" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"
+          }`}
+        >
+          <BarChart3 className="h-4 w-4 mr-2 inline" />
+          Analytics
+        </button>
+        {/* <button
           onClick={() => setActiveTab("demo")}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             activeTab === "demo" ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"
           }`}
         >
           Live Demo
-        </button>
+        </button> */}
       </div>
 
       {/* Overview Tab */}

@@ -98,15 +98,15 @@ export function SSIDemoPage() {
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-2">Shared Data</h4>
-                  <pre className="bg-gray-100 p-3 rounded text-xs overflow-auto max-h-40">
+                  <h4 className="font-medium mb-2 text-black">Shared Data</h4>
+                  <pre className="bg-gray-100 p-3 rounded text-xs overflow-auto max-h-40 text-green-900">
                     {JSON.stringify(authResult.sharedData, null, 2)}
                   </pre>
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-2">Cryptographic Proof</h4>
-                  <div className="bg-gray-100 p-3 rounded text-xs">
+                  <h4 className="font-medium mb-2 text-black">Cryptographic Proof</h4>
+                  <div className="bg-gray-100 p-3 rounded text-xs text-green-900">
                     <p>
                       <strong>Data Hash:</strong> {authResult.proof.dataHash.slice(0, 20)}...
                     </p>
